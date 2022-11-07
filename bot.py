@@ -40,10 +40,8 @@ def calculate_effectiveness(multiplier, value):
         effectiveness[multiplier.name] = effectiveness[multiplier.name] * value
     else:
         effectiveness[multiplier.name] = effectiveness[multiplier.name] + value
-
-@tree.command(name = "peff", description = "Pokemon Type Effectiveness")
-async def first_command(interaction, pokemon: str):
-    
+        
+def process_command(pokemon):
     pokemon = pokebase.pokemon(pokemon)
     for type in pokemon.types:
         api_type = pokebase.type_(type.type.name).damage_relations
@@ -70,7 +68,15 @@ async def first_command(interaction, pokemon: str):
     for type in weak:
         message = message + '{} - {}\n'.format(type, weak[type])
     
-    await interaction.response.send_message(message)
+    return message
+    
+
+@tree.command(name = "peff", description = "Pokemon Type Effectiveness")
+async def first_command(interaction, pokemon: str):
+    await interaction.response.send_message("Calculating...")
+    result = process_command(pokemon)
+    await interaction.edit_original_response(content=result)
+    
     
 @client.event
 async def on_ready():
